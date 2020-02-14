@@ -13,7 +13,6 @@ var bind = function(fn, me) {
     for (var key in parent) {
       if (hasProp.call(parent, key)) child[key] = parent[key];
     }
-
     function ctor() {
       this.constructor = child;
     }
@@ -61,8 +60,7 @@ _.find = function(obj, attrs) {
 };
 
 (function() {
-  var DraggableObject, GoogleApiMock, MapObject, MockInfoWindow, PositionObject, VisibleObject, capitalize, getCircle,
-    getSize, getLatLng, getMVCArray, getMap, getMarker, getPolyline;
+  var DraggableObject, GoogleApiMock, MapObject, MockInfoWindow, PositionObject, VisibleObject, capitalize, getCircle, getSize, getLatLng, getMVCArray, getMap, getMarker, getPolyline;
   capitalize = function(s) {
     return s[0].toUpperCase() + s.slice(1);
   };
@@ -427,6 +425,8 @@ _.find = function(obj, attrs) {
       Map.prototype.getControls = function() {
         return this.controls;
       };
+      Map.prototype.setMapTypeId = function() {
+      };
       Map.prototype.setOpts = function() {
       };
       Map.prototype.setOptions = function() {
@@ -662,9 +662,9 @@ _.find = function(obj, attrs) {
         this.mockPolyline,
         this.mockMap,
         this.mockPlaces,
+        this.mockGeocoder,
         this.mockSearchBox,
-        this.mockGeometry,
-        this.mockGeocoder
+        this.mockGeometry
       ];
       this.initAll = function() {
         return this.mocks.forEach(function(fn) {
@@ -687,7 +687,8 @@ _.find = function(obj, attrs) {
         clearListeners: unmocked('event.clearListeners'),
         addListener: unmocked('event.addListener'),
         addDomListener: unmocked('event.addDomListener'),
-        removeListener: unmocked('event.removeListener')
+        removeListener: unmocked('event.removeListener'),
+        trigger: unmocked('event.trigger')
       };
       window.google.maps.OverlayView = unmocked('OverlayView');
       window.google.maps.InfoWindow = unmocked('InfoWindow');
@@ -700,13 +701,20 @@ _.find = function(obj, attrs) {
 
     GoogleApiMock.prototype.mockPlaces = function() {
       return window.google.maps.places = {
-        Autocomplete: function() {
+        Autocomplete: function () {
           return {
-            addListener: function() {
-            }
+            addListener: function () { }
           };
         }
       };
+    };
+
+    GoogleApiMock.prototype.mockGeocoder = function(Geocoder) {
+      if (Geocoder == null) {
+        Geocoder = function() {
+        };
+      }
+      return window.google.maps.Geocoder = Geocoder;
     };
 
     GoogleApiMock.prototype.mockSearchBox = function(SearchBox) {
@@ -900,6 +908,11 @@ _.find = function(obj, attrs) {
           });
         };
       }
+      if (!event.trigger) {
+        event.trigger = function(thing, eventName) {
+          console.log('Event: ' + eventName + ' is triggered');
+        };
+      }
       window.google.maps.event = event;
       return listeners;
     };
@@ -1009,14 +1022,6 @@ _.find = function(obj, attrs) {
         };
         return this;
       };
-    };
-
-    GoogleApiMock.prototype.mockGeocoder = function(Geocoder) {
-      if (Geocoder == null) {
-        Geocoder = function() {
-        };
-      }
-      return window.google.maps.Geocoder = Geocoder;
     };
 
     GoogleApiMock.prototype.mockGeometry = function(geometry) {
