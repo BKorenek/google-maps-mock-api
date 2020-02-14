@@ -1,0 +1,13 @@
+{
+  "name": "google-maps-mock-api",
+  "version": "0.0.1",
+  "description": "This is a mock for use when JS unit testing google maps",
+  "main": "gmaps.mock.api.js",
+  "contributors": [
+    "https://github.com/prasathmani",
+    "Juan Mrad <johnnie@healthlabs.com",
+    "Johnnei Zhang <johnnie@healthlabs.com"
+  ],
+  "license": "Private",
+  "private": true
+}
